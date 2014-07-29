@@ -52,11 +52,11 @@ class DataStore(object):
 class RedisDataStore(DataStore):
     """Redis-backed datastore object."""
 
-    def __init__(self):
-        #TODO(tvoran): get host and port from config or env
+    def __init__(self, number=0):
         redis_host = os.environ.get('REDIS_PORT_6379_TCP_ADDR')
         redis_port = os.environ.get('REDIS_PORT_6379_TCP_PORT')
-        self.redis_conn = StrictRedis(host=redis_host, port=redis_port, db=0)
+        self.redis_conn = StrictRedis(host=redis_host, port=redis_port,
+                                      db=number)
 
     def __setitem__(self, k, v):
         self.redis_conn.set(k, v)
@@ -64,13 +64,22 @@ class RedisDataStore(DataStore):
     def __getitem__(self, k):
         return self.redis_conn.get(k)
 
+    def __delitem__(self, k):
+        self.redis_conn.delete(k)
+
     def get(self, k):
         return self.redis_conn.get(k)
 
+    def __contains__(self, k):
+        return self.redis_conn.exists(k):
+
     def todict(self):
         #TODO(tvoran): use paginate
-        #TODO(tvoran): scan doesn't seem to work...
+        #TODO(tvoran): do something besides multiple gets
         data = {}
-        for key, value in self.redis_conn.scan():
-            data[key] = value
+        for key in self.redis_conn.keys():
+            data[key] = self.get(key)
         return data
+
+    def clear_all(self):
+        self.redis_conn.flushdb()
