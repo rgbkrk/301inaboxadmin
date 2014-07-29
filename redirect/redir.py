@@ -34,3 +34,9 @@ class DataStore(object):
             from_url = to_url
         return from_url
 
+    def todict(self):
+        data = {}
+        for key, value in self.data.iteritems():
+            data[key] = value
+        return data
+

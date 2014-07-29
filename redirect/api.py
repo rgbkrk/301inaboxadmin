@@ -1,6 +1,10 @@
-from flask import Flask
+import json
+from flask import Flask, request
 
-appname = "app"
+from redir import DataStore
+
+appname = "api"
+recordstore = DataStore()
 
 app = Flask(appname)
 app.config.from_object(appname)
@@ -10,18 +14,31 @@ app.config.update(dict(
 ))
 
 @app.route('/')
-def test():
-    return "Hello 301 in a Box!\n"
+def index():
+    return "Welcome to the 301-in-a-Box admin interface!\n"
+
 
 @app.route('/api/records', methods=['GET'])
 def get_records():
     """Get ALIAS records"""
-    return "This will retrieve ALIAS records\n"
+    return json.dumps(recordstore.todict())
+
+
 
 @app.route('/api/records', methods=['POST'])
 def post_record():
     """Add ALIAS record to database"""
-    return "This will add an ALIAS record to the database\n"
+    data = request.get_json()
+    record = data['record']
+    hostname = record['hostname']
+    url = record['url']
+
+    recordstore[hostname] = url
+    response = '''
+        Record:
+        {0}
+    '''.format(recordstore[hostname])
+    return response
 
 @app.route('/api/records/<record_id>', methods=['PUT'])
 def put_record(record_id):
