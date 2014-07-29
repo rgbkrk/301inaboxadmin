@@ -27,7 +27,8 @@ def get_records():
 def get_record(record_id):
     if record_id and record_id in recordstore:
         record = {}
-        record[record_id] = recordstore[record_id]
+        record['hostname'] = record_id
+        record['url'] = recordstore[record_id]
         return json.dumps(record)
     else:
         return "No such record exists.\n"
@@ -62,7 +63,9 @@ def delete_record(record_id):
     """Delete ALIAS record from the database"""
     if record_id in recordstore:
         record = {}
-        record[record_id] = recordstore[record_id]
+        record = {}
+        record['hostname'] = record_id
+        record['url'] = recordstore[record_id]
         del recordstore[record_id]
         return "Deleted record: {0}\n".format(json.dumps(record))
     else:
