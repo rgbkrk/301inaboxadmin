@@ -71,7 +71,7 @@ class RedisDataStore(DataStore):
         return self.redis_conn.get(k)
 
     def __contains__(self, k):
-        return self.redis_conn.exists(k):
+        return self.redis_conn.exists(k)
 
     def todict(self):
         #TODO(tvoran): use paginate
