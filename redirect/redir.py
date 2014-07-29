@@ -17,8 +17,14 @@ class DataStore(object):
     def __getitem__(self, k):
         return self.data[k]
 
+    def __delitem__(self, k):
+        del self.data[k]
+
     def get(self, k):
         return self.data.get(k)
+
+    def __contains__(self, k):
+        return k in self.data
 
     def redirect(self, url):
         """Really basic redirect algorithm with cycle detection."""
