@@ -1,10 +1,12 @@
+from redis import StrictRedis
+import os
 
 class RedirectException(Exception):
     def __init__(self, msg):
         super(Exception, self).__init__(msg)
 
 class DataStore(object):
-    """Our abstracted datastore. This base class is just a dictionary. 
+    """Our abstracted datastore. This base class is just a dictionary.
     Subclass this and override the __setitem__, __getitem__, and get
     methods to use some other storage."""
 
@@ -46,3 +48,29 @@ class DataStore(object):
             data[key] = value
         return data
 
+
+class RedisDataStore(DataStore):
+    """Redis-backed datastore object."""
+
+    def __init__(self):
+        #TODO(tvoran): get host and port from config or env
+        redis_host = os.environ.get('REDIS_PORT_6379_TCP_ADDR')
+        redis_port = os.environ.get('REDIS_PORT_6379_TCP_PORT')
+        self.redis_conn = StrictRedis(host=redis_host, port=redis_port, db=0)
+
+    def __setitem__(self, k, v):
+        self.redis_conn.set(k, v)
+
+    def __getitem__(self, k):
+        return self.redis_conn.get(k)
+
+    def get(self, k):
+        return self.redis_conn.get(k)
+
+    def todict(self):
+        #TODO(tvoran): use paginate
+        #TODO(tvoran): scan doesn't seem to work...
+        data = {}
+        for key, value in self.redis_conn.scan():
+            data[key] = value
+        return data
