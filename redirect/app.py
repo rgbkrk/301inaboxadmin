@@ -1,10 +1,16 @@
 import json
+import os
 from flask import Flask, request
 
 from redir import DataStore
+from redir import RedisDataStore
 
 appname = "app"
-recordstore = DataStore()
+if (os.environ.get('REDIS_PORT_6379_TCP_ADDR') and
+    os.environ.get('REDIS_PORT_6379_TCP_PORT')):
+    recordstore = RedisDataStore()
+else:
+    recordstore = DataStore()
 
 app = Flask(appname)
 app.config.from_object(appname)

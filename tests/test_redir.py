@@ -32,3 +32,10 @@ class TestRedir(unittest.TestCase):
             self.datastore.redirect('1')
 
 
+class TestRedisRedir(TestRedir):
+
+    def setUp(self):
+        self.datastore = redir.RedisDataStore(number=15)
+
+    def tearDown(self):
+        self.datastore.clear_all()
