@@ -10,7 +10,7 @@ app = Flask(appname)
 app.config.from_object(appname)
 
 app.config.update(dict(
-    DEBUG=True
+    DEBUG=True,
 ))
 
 @app.route('/')
@@ -60,4 +60,4 @@ def delete_record(record_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=8080)
