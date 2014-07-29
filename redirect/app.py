@@ -23,11 +23,22 @@ def get_records():
     """Get ALIAS records"""
     return json.dumps(recordstore.todict())
 
+@app.route('/api/records/<record_id>', methods=['GET'])
+def get_record(record_id):
+    if record_id and record_id in recordstore:
+        record = {}
+        record[record_id] = recordstore[record_id]
+        return json.dumps(record)
+    else:
+        return "No such record exists.\n"
+
 
 @app.route('/api/records', methods=['POST'])
 def post_record():
     """Add ALIAS record to database"""
     data = request.get_json()
+    if not data:
+        return "Error: Invalid JSON.\n"
     record = data['record']
     hostname = record['hostname']
     url = record['url']
@@ -60,4 +71,4 @@ def delete_record(record_id):
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
+    app.run(host='0.0.0.0', port=8080)
