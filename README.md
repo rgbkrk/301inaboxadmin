@@ -1,12 +1,4 @@
-301inabox
-=========
+301inaboxadmin
+==============
 
-HTTP Redirects in a box
-
-Running the tests
-================
-
-Use a generic test runner like nose or pytest
-
-    pip install nose
-    nosetests -v
+Admin/API for 301inabox

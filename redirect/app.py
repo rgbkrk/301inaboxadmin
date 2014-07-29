@@ -3,7 +3,7 @@ from flask import Flask, request
 
 from redir import DataStore
 
-appname = "api"
+appname = "app"
 recordstore = DataStore()
 
 app = Flask(appname)
