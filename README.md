@@ -1,9 +1,9 @@
-301inaboxadmin
-==============
+301 in a box admin
+==================
 
 Admin/API for 301inabox
 
-# Quickstart
+## Quickstart
 
 From your trusty shell:
 
