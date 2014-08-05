@@ -1,3 +1,5 @@
+from redis import StrictRedis
+import os
 
 class RedirectException(Exception):
     def __init__(self, msg):
@@ -8,7 +10,7 @@ class RequestException(Exception):
         super(Exception, self).__init__(msg)
 
 class DataStore(object):
-    """Our abstracted datastore. This base class is just a dictionary. 
+    """Our abstracted datastore. This base class is just a dictionary.
     Subclass this and override the __setitem__, __getitem__, and get
     methods to use some other storage."""
 
@@ -50,3 +52,38 @@ class DataStore(object):
             data[key] = value
         return data
 
+
+class RedisDataStore(DataStore):
+    """Redis-backed datastore object."""
+
+    def __init__(self, number=0):
+        redis_host = os.environ.get('REDIS_PORT_6379_TCP_ADDR')
+        redis_port = os.environ.get('REDIS_PORT_6379_TCP_PORT')
+        self.redis_conn = StrictRedis(host=redis_host, port=redis_port,
+                                      db=number)
+
+    def __setitem__(self, k, v):
+        self.redis_conn.set(k, v)
+
+    def __getitem__(self, k):
+        return self.redis_conn.get(k)
+
+    def __delitem__(self, k):
+        self.redis_conn.delete(k)
+
+    def get(self, k):
+        return self.redis_conn.get(k)
+
+    def __contains__(self, k):
+        return self.redis_conn.exists(k)
+
+    def todict(self):
+        #TODO(tvoran): use paginate
+        #TODO(tvoran): do something besides multiple gets
+        data = {}
+        for key in self.redis_conn.keys():
+            data[key] = self.get(key)
+        return data
+
+    def clear_all(self):
+        self.redis_conn.flushdb()

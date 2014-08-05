@@ -1,12 +1,18 @@
 import json
+import os
 import textwrap
+
 from flask import Flask, request
 
 from redir import DataStore
-from redir import RequestException
+from redir import RedisDataStore
 
 appname = "app"
-recordstore = DataStore()
+if (os.environ.get('REDIS_PORT_6379_TCP_ADDR') and
+    os.environ.get('REDIS_PORT_6379_TCP_PORT')):
+    recordstore = RedisDataStore()
+else:
+    recordstore = DataStore()
 
 app = Flask(appname)
 app.config.from_object(appname)
@@ -87,4 +93,4 @@ def delete_record(record_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0', port=8080)

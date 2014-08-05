@@ -31,4 +31,22 @@ class TestRedir(unittest.TestCase):
         with self.assertRaises(redir.RedirectException):
             self.datastore.redirect('1')
 
+    def test_todict(self):
+        assert self.datastore.todict() == {}
+        data = { '1': '2', '2': '3' }
+        for k, v in data.iteritems():
+            self.datastore[k] = v
+        assert self.datastore.todict() == data
 
+    def test_contains(self):
+        self.datastore['key'] ='value'
+        assert 'key' in self.datastore
+
+
+class TestRedisRedir(TestRedir):
+
+    def setUp(self):
+        self.datastore = redir.RedisDataStore(number=15)
+
+    def tearDown(self):
+        self.datastore.clear_all()
