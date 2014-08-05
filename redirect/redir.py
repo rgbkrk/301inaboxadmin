@@ -3,6 +3,10 @@ class RedirectException(Exception):
     def __init__(self, msg):
         super(Exception, self).__init__(msg)
 
+class RequestException(Exception):
+    def __init__(self, msg):
+        super(Exception, self).__init__(msg)
+
 class DataStore(object):
     """Our abstracted datastore. This base class is just a dictionary. 
     Subclass this and override the __setitem__, __getitem__, and get
@@ -29,7 +33,7 @@ class DataStore(object):
     def redirect(self, url):
         """Really basic redirect algorithm with cycle detection."""
         # todo: use Flask's redirect support
-        seen_urls = set([url])
+        seen_urls = {url}
         from_url = url
         while True:
             to_url = self.get(from_url)
@@ -41,7 +45,7 @@ class DataStore(object):
         return from_url
 
     def todict(self):
-        data = {}
+        data = dict()
         for key, value in self.data.iteritems():
             data[key] = value
         return data

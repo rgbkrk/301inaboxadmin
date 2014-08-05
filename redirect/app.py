@@ -1,7 +1,9 @@
 import json
+import textwrap
 from flask import Flask, request
 
 from redir import DataStore
+from redir import RequestException
 
 appname = "app"
 recordstore = DataStore()
@@ -26,7 +28,7 @@ def get_records():
 @app.route('/api/records/<record_id>', methods=['GET'])
 def get_record(record_id):
     if record_id and record_id in recordstore:
-        record = {}
+        record = dict()
         record['hostname'] = record_id
         record['url'] = recordstore[record_id]
         return json.dumps(record)
@@ -35,20 +37,32 @@ def get_record(record_id):
 
 
 @app.route('/api/records', methods=['POST'])
-def post_record():
-    """Add ALIAS record to database"""
+def post_records():
+    """Add ALIAS record, or multiple records, to database"""
     data = request.get_json()
     if not data:
         return "Error: Invalid JSON.\n"
-    record = data['record']
-    hostname = record['hostname']
-    url = record['url']
 
-    recordstore[hostname] = url
-    response = '''
-        Record created:
-        {0} -> {1}
-    '''.format(hostname, recordstore[hostname])
+    addrecords = []
+
+    if 'records' in data and type(data['records']) is list:
+        addrecords.extend(data['records'])
+    else:
+        return "Error: Missing/Invalid field 'records'"
+
+    response = "Records created:\n[\n"
+
+    # Add all records to storage
+    for record in addrecords:
+        hostname = record['hostname']
+        url = record['url']
+        recordstore[hostname] = url
+
+        response += "\t{0} -> {1}\n".format(hostname, url)
+
+    response += "]\n"
+    response = textwrap.dedent(response)
+
     return response
 
 
@@ -62,8 +76,7 @@ def put_record(record_id):
 def delete_record(record_id):
     """Delete ALIAS record from the database"""
     if record_id in recordstore:
-        record = {}
-        record = {}
+        record = dict()
         record['hostname'] = record_id
         record['url'] = recordstore[record_id]
         del recordstore[record_id]
@@ -74,4 +87,4 @@ def delete_record(record_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8081)
